@@ -20,6 +20,8 @@ type LimiterConf struct {
 	PermaBanThreshold int
 }
 
+var DB db.DbInterface = db.InitDB()
+
 func DefaultLimiterConf() LimiterConf {
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
 	if (err != nil) || (windowInt < 1) {
@@ -75,19 +77,19 @@ func New(config LimiterConf) fiber.Handler {
 
 func checkIp(ip string, config LimiterConf) (block string) {
 	// check for PermaBan, return if true
-	res, err := db.Read("PermaBan" + "|" + ip)
+	res, err := DB.Read("PermaBan" + "|" + ip)
 	if err == nil && res != "" {
 		block = "perma"
 		return block
 	}
 
 	// check number of times ip has been requested in last window
-	res, err = db.Read(config.LimiterName + "|" + ip)
+	res, err = DB.Read(config.LimiterName + "|" + ip)
 	if err != nil {
 		// "Key not found" is expected.
 		// Any other error is logged accordingly
 		if err.Error() == "Key not found" {
-			db.WriteTTL(config.LimiterName+"|"+ip, "1", config.Window)
+			DB.WriteTTL(config.LimiterName+"|"+ip, "1", config.Window)
 		} else {
 			l.Error(err)
 		}
@@ -97,12 +99,12 @@ func checkIp(ip string, config LimiterConf) (block string) {
 	if resInt >= config.RequestLimit {
 		block = config.Window.String()
 		if resInt >= config.PermaBanThreshold {
-			db.WriteTTL("PermaBan"+"|"+ip, "1", config.PermaBanTime)
+			DB.WriteTTL("PermaBan"+"|"+ip, "1", config.PermaBanTime)
 			l.Warning("PermaBanned: " + ip + " by: " + config.LimiterName + " For: " + config.PermaBanTime.String())
 		}
 	}
 	resInt++
-	db.WriteTTL(config.LimiterName+"|"+ip, strconv.Itoa(resInt), config.Window)
+	DB.WriteTTL(config.LimiterName+"|"+ip, strconv.Itoa(resInt), config.Window)
 
 	return block
 }
