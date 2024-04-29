@@ -1,7 +1,8 @@
 package rateLimiter
 
 import (
-	"fmt"
+	"errors"
+	"os"
 	"strconv"
 	"time"
 
@@ -11,62 +12,93 @@ import (
 )
 
 type LimiterConf struct {
-	RequestLimit int
-	Window       time.Duration
-	DbLocation   string
-	LimiterName  string
+	RequestLimit      int
+	Window            time.Duration
+	DbLocation        string // Only applicable for badger
+	LimiterName       string
+	PermaBanTime      time.Duration
+	PermaBanThreshold int
 }
 
-func NewConfig() LimiterConf {
+func DefaultLimiterConf() LimiterConf {
+	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
+	if (err != nil) || (windowInt < 1) {
+		l.Error(errors.New("Environment variable 'WINDOW' must be an integer greater than 0. Please check your .env file."))
+		panic(err)
+	}
+	requestLimitInt, err := strconv.Atoi(os.Getenv("REQUEST_LIMIT"))
+	if (err != nil) || (requestLimitInt < 1) {
+		l.Error(errors.New("Environment variable 'REQUEST_LIMIT' must be an integer greater than 0. Please check your .env file."))
+		panic(err)
+	}
+	name := os.Getenv("LIMITER_NAME")
+	if name == "" {
+		name = "60s"
+	}
+	dbLocation := os.Getenv("DB_LOCATION")
+	if dbLocation == "" {
+		dbLocation = "badger"
+	}
+	permabanThresholdInt, err := strconv.Atoi(os.Getenv("PERMABAN_THRESHOLD"))
+	if (err != nil) || (permabanThresholdInt < 1) {
+		permabanThresholdInt = 10
+	}
+	permabanTimeInt, err := strconv.Atoi(os.Getenv("PERMABAN_TIME"))
+	if (err != nil) || (permabanTimeInt < 1) {
+		permabanTimeInt = 1440
+	}
 	return LimiterConf{
-		RequestLimit: 5,
-		Window:       60 * time.Second,
-		DbLocation:   "rateLimiter.db",
-		LimiterName:  "60s",
+		RequestLimit:      requestLimitInt,
+		Window:            time.Duration(windowInt) * time.Second,
+		DbLocation:        dbLocation,
+		LimiterName:       name,
+		PermaBanTime:      time.Duration(permabanTimeInt) * time.Minute,
+		PermaBanThreshold: permabanThresholdInt,
 	}
 }
 
 func New(config LimiterConf) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
-		timer := time.Now()
 		ip := c.IP()
 		block := checkIp(ip, config)
-
-		fmt.Println(time.Since(timer))
 
 		if block == "perma" {
 			return c.Status(429).SendString("PermaBanned")
 		}
 		if block != "" {
-			return c.Status(429).SendString("Cool down for " + block + ". Refreshing will reset the cooldown.")
+			return c.Status(429).SendString("Cool down for " + block + ". Refreshing will reset the cooldown. \nRefreshes past this point will result in a ban.")
 		}
 		return c.Next()
 	}
 }
 
 func checkIp(ip string, config LimiterConf) (block string) {
-	// check for PermaBan
-	permaRes, err := db.Read("PermaBan" + "|" + ip)
-	if err == nil && permaRes != "" {
+	// check for PermaBan, return if true
+	res, err := db.Read("PermaBan" + "|" + ip)
+	if err == nil && res != "" {
 		block = "perma"
 		return block
 	}
 
-	// TODO check if it's in the database, if not, add
-	res, err := db.Read(config.LimiterName + "|" + ip)
+	// check number of times ip has been requested in last window
+	res, err = db.Read(config.LimiterName + "|" + ip)
 	if err != nil {
-		fmt.Println(err)
-		db.WriteTTL(config.LimiterName+"|"+ip, "1", config.Window)
+		// "Key not found" is expected.
+		// Any other error is logged accordingly
+		if err.Error() == "Key not found" {
+			db.WriteTTL(config.LimiterName+"|"+ip, "1", config.Window)
+		} else {
+			l.Error(err)
+		}
 	}
 
 	resInt, _ := strconv.Atoi(res)
-
 	if resInt >= config.RequestLimit {
 		block = config.Window.String()
-		if resInt >= 30 {
-			db.WriteTTL("PermaBan"+"|"+ip, "1", time.Hour*24)
-			l.Warning("PermaBanned: " + ip)
+		if resInt >= config.PermaBanThreshold {
+			db.WriteTTL("PermaBan"+"|"+ip, "1", config.PermaBanTime)
+			l.Warning("PermaBanned: " + ip + " by: " + config.LimiterName + " For: " + config.PermaBanTime.String())
 		}
 	}
 	resInt++

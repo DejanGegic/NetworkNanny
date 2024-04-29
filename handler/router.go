@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"example.com/l"
@@ -21,10 +22,10 @@ func SetUpRouter() *fiber.App {
 	app := fiber.New()
 	l.Info("Server started")
 
-	app.Use(rateLimiter.New(rateLimiter.NewConfig()))
+	app.Use(rateLimiter.New(rateLimiter.DefaultLimiterConf()))
 
-	app.Use("/data", filesystem.New(filesystem.Config{
-		Root: http.Dir("./public"),
+	app.Use(os.Getenv("BASE_URL_PATH"), filesystem.New(filesystem.Config{
+		Root: http.Dir(os.Getenv("PUBLIC_DIR")),
 	}))
 
 	return app

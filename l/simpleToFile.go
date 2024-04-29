@@ -10,9 +10,9 @@ import (
 // var logger = zerolog.New(os.Stdout).With().Timestamp().Logger()
 var Z = zerolog.New(&lumberjack.Logger{
 	Filename:   "logs/zero.log", // File name
-	MaxSize:    500,             // Size in MB before file gets rotated
+	MaxSize:    20,              // Size in MB before file gets rotated
 	MaxBackups: 5,               // Max number of files kept before being overwritten
-	MaxAge:     14,              // Max number of days to keep the files
+	MaxAge:     7,               // Max number of days to keep the files
 	Compress:   true,            // Whether to compress log files using gzip
 	LocalTime:  true,            // Local time zone
 }).With().Timestamp().Logger()

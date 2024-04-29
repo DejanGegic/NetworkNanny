@@ -1,0 +1,16 @@
+services:
+  sleipnir:
+    image: redis:alpine
+    container_name: sleipnir
+    restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
+    volumes:
+      - ./data/sleipnir:/data
+    ports:
+      - 6379:6379
+    networks:
+      - hestia
+
+networks:
+  hestia:
+    driver: bridge
