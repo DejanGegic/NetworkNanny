@@ -54,11 +54,7 @@ func (r RedisInstance) Write(key string, value string) error {
 }
 
 func (r RedisInstance) WriteTTL(key string, value string, tll time.Duration) error {
-	err := r.Set(key, value, tll).Err()
-	if err != nil {
-		return err
-	}
-	return err
+	return r.Set(key, value, tll).Err()
 }
 
 func (r RedisInstance) Read(key string) (string, error) {
@@ -73,7 +69,8 @@ func (r RedisInstance) Read(key string) (string, error) {
 func (r RedisInstance) ReadTTL(key string) (string, time.Duration, error) {
 	val, err := r.Get(key).Result()
 	if err != nil {
-		val = "0"
+		val = ""
+		return val, 0, err
 	}
 	// convert the string to an int
 	ttl, err := r.TTL(key).Result()
