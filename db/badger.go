@@ -42,7 +42,7 @@ func (b BadgerInstance) WriteTTL(key string, value string, ttl time.Duration) er
 	key = key + "_ttl"
 	//convert duration to time
 	ttlTime := time.Now().Add(ttl)
-	e = badger.NewEntry([]byte(key), []byte(ttlTime.String())).WithTTL(ttl)
+	e = badger.NewEntry([]byte(key), []byte(ttlTime.Format(time.RFC3339))).WithTTL(ttl)
 	txn = b.NewTransaction(true)
 	if err := txn.SetEntry(e); err != nil {
 		// TODO: delete the key if there is an error
@@ -104,7 +104,11 @@ func (b BadgerInstance) ReadTTL(key string) (value string, ttl time.Duration, er
 	}
 
 	// convert string to time
-	ttl, err = time.ParseDuration(ttlString)
+	ttlTime, err := time.Parse(time.RFC3339, ttlString)
+	if err != nil {
+		return value, ttl, err
+	}
+	ttl = ttlTime.Sub(time.Now())
 	return value, ttl, err
 
 }
