@@ -3,3 +3,5 @@ badger
 logs
 main
 data
+
+.env
