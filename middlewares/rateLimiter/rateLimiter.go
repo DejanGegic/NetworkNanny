@@ -26,12 +26,12 @@ var DB db.DbInterface = db.InitDB()
 func DefaultLimiterConf() LimiterConf {
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
 	if (err != nil) || (windowInt < 1) {
-		l.Error(errors.New("Environment variable 'WINDOW' must be an integer greater than 0. Please check your .env file."))
+		l.Error(errors.New("environment variable 'WINDOW' must be an integer greater than 0. Please check your .env file"))
 		panic(err)
 	}
 	requestLimitInt, err := strconv.Atoi(os.Getenv("REQUEST_LIMIT"))
 	if (err != nil) || (requestLimitInt < 1) {
-		l.Error(errors.New("Environment variable 'REQUEST_LIMIT' must be an integer greater than 0. Please check your .env file."))
+		l.Error(errors.New("environment variable 'REQUEST_LIMIT' must be an integer greater than 0. Please check your .env file"))
 		panic(err)
 	}
 	name := os.Getenv("LIMITER_NAME")
@@ -66,7 +66,7 @@ func New(config LimiterConf) fiber.Handler {
 		ip := c.IP()
 		timer := time.Now()
 		block, ttl := checkIp(ip, config)
-		fmt.Println(time.Now().Sub(timer))
+		fmt.Println(time.Since(timer))
 
 		if block == "perma" {
 			return c.Status(429).SendString("PermaBanned")
