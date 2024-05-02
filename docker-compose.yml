@@ -1,25 +1,13 @@
 services:
-  # sleipnir:
-  #   image: redis:alpine
-  #   container_name: sleipnir
-  #   restart: always
-  #   command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
-  #   volumes:
-  #     - ./data/sleipnir:/data
-  #   ports:
-  #     - 6379:6379
-  #   networks:
-  #     - hestia
-
-  redka:
-    image: nalgeon/redka
-    container_name: redka
-    restart: unless-stopped
-    ports:
-      - 6380:6380
-      - 6379:6379
+  sleipnir:
+    image: redis:alpine
+    container_name: sleipnir
+    restart: always
+    command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
     volumes:
-      - ./data/redka:/data
+      - ./data/sleipnir:/data
+    ports:
+      - 6379:6379
     networks:
       - hestia
 
