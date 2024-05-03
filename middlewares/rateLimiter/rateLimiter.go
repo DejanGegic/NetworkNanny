@@ -1,7 +1,6 @@
 package rateLimiter
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -25,36 +24,24 @@ var DB db.DbInterface = db.InitDB()
 
 func DefaultLimiterConf() LimiterConf {
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
-	if (err != nil) || (windowInt < 1) {
-		l.Error(errors.New("environment variable 'WINDOW' must be an integer greater than 0. Please check your .env file"))
-		panic(err)
-	}
+
 	requestLimitInt, err := strconv.Atoi(os.Getenv("REQUEST_LIMIT"))
-	if (err != nil) || (requestLimitInt < 1) {
-		l.Error(errors.New("environment variable 'REQUEST_LIMIT' must be an integer greater than 0. Please check your .env file"))
-		panic(err)
-	}
-	name := os.Getenv("LIMITER_NAME")
-	if name == "" {
-		name = "60s"
-	}
-	dbLocation := os.Getenv("DB_LOCATION")
-	if dbLocation == "" {
-		dbLocation = "badger"
-	}
+
 	permabanThresholdInt, err := strconv.Atoi(os.Getenv("PERMABAN_THRESHOLD"))
-	if (err != nil) || (permabanThresholdInt < 1) {
-		permabanThresholdInt = 10
+	if err != nil {
+		l.ErrorTrace(err)
+		panic(err)
 	}
 	permabanTimeInt, err := strconv.Atoi(os.Getenv("PERMABAN_TIME"))
-	if (err != nil) || (permabanTimeInt < 1) {
-		permabanTimeInt = 1440
+	if err != nil {
+		l.ErrorTrace(err)
+		panic(err)
 	}
 	return LimiterConf{
 		RequestLimit:      requestLimitInt,
 		Window:            time.Duration(windowInt) * time.Second,
-		DbLocation:        dbLocation,
-		LimiterName:       name,
+		DbLocation:        os.Getenv("DB_LOCATION"),
+		LimiterName:       os.Getenv("LIMITER_NAME"),
 		PermaBanTime:      time.Duration(permabanTimeInt) * time.Minute,
 		PermaBanThreshold: permabanThresholdInt,
 	}
