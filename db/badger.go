@@ -39,16 +39,17 @@ func (b BadgerInstance) WriteTTL(key string, value string, ttl time.Duration) er
 	}
 
 	// save TTL
-	key = key + "_ttl"
+	keyTTL := key + "_ttl"
 	//convert duration to time
 	ttlTime := time.Now().Add(ttl)
-	e = badger.NewEntry([]byte(key), []byte(ttlTime.Format(time.RFC3339))).WithTTL(ttl)
+	e = badger.NewEntry([]byte(keyTTL), []byte(ttlTime.Format(time.RFC3339))).WithTTL(ttl)
 	txn = b.NewTransaction(true)
 	if err := txn.SetEntry(e); err != nil {
-		// TODO: delete the key if there is an error
+		b.Delete(key)
 		return err
 	}
 	if err := txn.Commit(); err != nil {
+		b.Delete(key)
 		return err
 	}
 
