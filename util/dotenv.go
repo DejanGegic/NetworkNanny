@@ -68,6 +68,18 @@ func envDefaults() {
 	if os.Getenv("DB_TYPE") == "" {
 		os.Setenv("DB_TYPE", "badger")
 	}
+	// BASE_URL_PATH
+	if os.Getenv("BASE_URL_PATH") == "" {
+		os.Setenv("BASE_URL_PATH", "/")
+	}
+	// PUBLIC_DIR
+	if os.Getenv("PUBLIC_DIR") == "" {
+		os.Setenv("PUBLIC_DIR", "public")
+	}
+	// PORT
+	if os.Getenv("PORT") == "" {
+		os.Setenv("PORT", "8000")
+	}
 
 	l.Info("Environment variables loaded." + " | " +
 		"WINDOW: " + os.Getenv("WINDOW") + " | " +
@@ -76,5 +88,8 @@ func envDefaults() {
 		"DB_LOCATION: " + os.Getenv("DB_LOCATION") + " | " +
 		"PERMABAN_THRESHOLD: " + os.Getenv("PERMABAN_THRESHOLD") + " | " +
 		"PERMABAN_TIME: " + os.Getenv("PERMABAN_TIME") + " | " +
-		"DB_TYPE: " + os.Getenv("DB_TYPE"))
+		"DB_TYPE: " + os.Getenv("DB_TYPE") + " | " +
+		"BASE_URL_PATH: " + os.Getenv("BASE_URL_PATH") + " | " +
+		"PUBLIC_DIR: " + os.Getenv("PUBLIC_DIR") + " | " +
+		"PORT: " + os.Getenv("PORT"))
 }
