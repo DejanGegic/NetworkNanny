@@ -24,9 +24,9 @@ func TestInitDB(t *testing.T) {
 		t.Errorf("Read() = %v, want %v", result, "test")
 	}
 
-	// os.Setenv("DB_TYPE", "badger")
-	// db = InitDB()
-	// if reflect.TypeOf(db).String() != "*db.BadgerInstance" {
-	// 	t.Errorf("InitDB() = %v, want %v", reflect.TypeOf(db).String(), "*db.BadgerInstance")
-	// }
+	os.Setenv("DB_TYPE", "badger")
+	db = InitDB()
+	if reflect.TypeOf(db).String() != "*db.BadgerInstance" {
+		t.Errorf("InitDB() = %v, want %v", reflect.TypeOf(db).String(), "*db.BadgerInstance")
+	}
 }
