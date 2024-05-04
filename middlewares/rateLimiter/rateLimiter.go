@@ -1,7 +1,6 @@
 package rateLimiter
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"time"
@@ -51,9 +50,9 @@ func New(config LimiterConf) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		ip := c.IP()
-		timer := time.Now()
+		// timer := time.Now()
 		block, ttl := checkIp(ip, config)
-		fmt.Println(time.Since(timer))
+		// fmt.Println(time.Since(timer))
 
 		if block == "perma" {
 			return c.Status(429).SendString("PermaBanned")
@@ -70,7 +69,7 @@ func checkIp(ip string, config LimiterConf) (block string, ttl time.Duration) {
 	res, ttl, err := DB.ReadTTL("PermaBan" + ":" + ip)
 	if err == nil && res != "" {
 		block = "perma"
-		l.Info("Requested after PermaBan: " + ip + " by: " + config.LimiterName)
+		// l.Info("Requested after PermaBan: " + ip + " by: " + config.LimiterName)
 		return block, ttl
 	}
 
