@@ -76,7 +76,6 @@ func (b BadgerInstance) Read(key string) (string, error) {
 }
 
 func (b BadgerInstance) ReadTTL(key string) (value string, ttl time.Duration, err error) {
-
 	// read data
 	err = b.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(key))
@@ -113,7 +112,8 @@ func (b BadgerInstance) ReadTTL(key string) (value string, ttl time.Duration, er
 	if err != nil {
 		return value, ttl, err
 	}
-	ttl = time.Since(ttlTime)
+	// calculate ttl
+	ttl = time.Until(ttlTime)
 	return value, ttl, err
 
 }
