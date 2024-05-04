@@ -1,9 +1,8 @@
 services:
   sleipnir:
-    image: redis:alpine
+    image: eqalpha/keydb
     container_name: sleipnir
     restart: always
-    command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
     volumes:
       - ./data/sleipnir:/data
     ports:
