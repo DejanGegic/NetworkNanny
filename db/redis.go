@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"example.com/l"
 	"github.com/go-redis/redis"
 )
 
@@ -24,6 +25,7 @@ func ConnectToRedisClient(host string, port string, password string, db int) Red
 		client,
 	}
 	if err := instance.Ping().Err(); err != nil {
+		l.Error(err)
 		log.Fatal(err)
 	}
 	fmt.Println("Redis connected")
