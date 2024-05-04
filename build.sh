@@ -25,5 +25,4 @@ platformLength=${#platforms[@]}
 echo "Built $platformLength packages successfully!"
 
 #set all as executable
-popd
 chmod +x ./dist/*
