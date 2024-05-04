@@ -3,5 +3,6 @@ badger
 logs
 main
 data
+dist
 
 .env
