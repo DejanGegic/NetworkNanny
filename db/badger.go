@@ -8,6 +8,10 @@ import (
 	"github.com/dgraph-io/badger/v4"
 )
 
+type BadgerInstance struct {
+	*badger.DB
+}
+
 func initBadger() *badger.DB {
 	fmt.Println(os.Getenv("DB_LOCATION"))
 	db, err := badger.Open(badger.DefaultOptions(os.Getenv("DB_LOCATION")).WithReadOnly(false))
@@ -109,13 +113,9 @@ func (b BadgerInstance) ReadTTL(key string) (value string, ttl time.Duration, er
 	if err != nil {
 		return value, ttl, err
 	}
-	ttl = ttlTime.Sub(time.Now())
+	ttl = time.Since(ttlTime)
 	return value, ttl, err
 
-}
-
-type BadgerInstance struct {
-	*badger.DB
 }
 
 func (b BadgerInstance) Delete(key string) error {
