@@ -37,18 +37,16 @@ func envDefaults() {
 	// WINDOW
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
 	if (err != nil) || (windowInt < 1) {
-		l.Error(errors.New("environment variable 'WINDOW' must be an integer greater than 0. Please check your .env file"))
-		panic(err)
+		os.Setenv("WINDOW", "600")
 	}
 	// REQUEST_LIMIT
 	requestLimitInt, err := strconv.Atoi(os.Getenv("REQUEST_LIMIT"))
 	if (err != nil) || (requestLimitInt < 1) {
-		l.Error(errors.New("environment variable 'REQUEST_LIMIT' must be an integer greater than 0. Please check your .env file"))
-		panic(err)
+		os.Setenv("REQUEST_LIMIT", "100")
 	}
 	// LIMITER_NAME
 	if os.Getenv("LIMITER_NAME") == "" {
-		os.Setenv("LIMITER_NAME", "60s")
+		os.Setenv("LIMITER_NAME", "10minutes")
 	}
 	// DB_LOCATION
 	if os.Getenv("DB_LOCATION") == "" {
