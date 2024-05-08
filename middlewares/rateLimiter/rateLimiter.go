@@ -21,6 +21,14 @@ type LimiterConf struct {
 
 var DB db.DbInterface = db.InitDB()
 
+// DefaultLimiterConf returns the default configuration for the rate limiter.
+//
+// This function retrieves the values of the "WINDOW", "REQUEST_LIMIT", "PERMABAN_THRESHOLD",
+// and "PERMABAN_TIME" environment variables and converts them to their respective types.
+// It then constructs and returns a LimiterConf struct with the retrieved values.
+//
+// Returns:
+// - LimiterConf: the default configuration for the rate limiter.
 func DefaultLimiterConf() LimiterConf {
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
 
@@ -64,6 +72,14 @@ func New(config LimiterConf) fiber.Handler {
 	}
 }
 
+// checkIp checks the IP address against the rate limiter configuration.
+//
+// Parameters:
+// - ip: the IP address to check.
+// - config: the rate limiter configuration.
+// Returns:
+// - block: the status of the block (perma or empty).
+// - ttl: the time duration until the next request is allowed.
 func checkIp(ip string, config LimiterConf) (block string, ttl time.Duration) {
 	// check for PermaBan, return if true
 	res, ttl, err := DB.ReadTTL("PermaBan" + ":" + ip)
