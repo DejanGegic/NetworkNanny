@@ -66,7 +66,7 @@ func New(config LimiterConf) fiber.Handler {
 			return c.Status(429).SendString("PermaBanned")
 		}
 		if block != "" {
-			return c.Status(429).SendString("Cool down for " + ttl.Truncate(time.Second).String() + ", until: " + time.Now().Add(ttl).Format(time.Kitchen) + ".\nRefreshes past this point will result in a ban.")
+			return c.Status(429).SendString("Cool down for " + ttl.Truncate(time.Second).String() + ", until: " + time.Now().Add(ttl).Format(time.TimeOnly) + ".\nRefreshes past this point will result in a ban.")
 		}
 		return c.Next()
 	}
