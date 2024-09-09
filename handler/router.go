@@ -23,7 +23,8 @@ func SetUpRouter() *fiber.App {
 	app.Use(rateLimiter.New(rateLimiter.DefaultLimiterConf()))
 
 	app.Use(os.Getenv("BASE_URL_PATH"), filesystem.New(filesystem.Config{
-		Root: http.Dir(os.Getenv("PUBLIC_DIR")),
+		Root:   http.Dir(os.Getenv("PUBLIC_DIR")),
+		Browse: getAllowBrowsing(),
 	}))
 
 	return app

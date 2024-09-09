@@ -31,8 +31,16 @@ var DB db.DbInterface = db.InitDB()
 // - LimiterConf: the default configuration for the rate limiter.
 func DefaultLimiterConf() LimiterConf {
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
+	if err != nil {
+		l.ErrorTrace(err)
+		panic(err)
+	}
 
 	requestLimitInt, err := strconv.Atoi(os.Getenv("REQUEST_LIMIT"))
+	if err != nil {
+		l.ErrorTrace(err)
+		panic(err)
+	}
 
 	permabanThresholdInt, err := strconv.Atoi(os.Getenv("PERMABAN_THRESHOLD"))
 	if err != nil {

@@ -34,6 +34,11 @@ func recursiveEnvLoad() {
 }
 
 func envDefaults() {
+	// ALLOW_BROWSING
+	_, err := strconv.ParseBool(os.Getenv("ALLOW_BROWSING"))
+	if err != nil {
+		os.Setenv("ALLOW_BROWSING", "false")
+	}
 	// WINDOW
 	windowInt, err := strconv.Atoi(os.Getenv("WINDOW"))
 	if (err != nil) || (windowInt < 1) {
@@ -89,5 +94,6 @@ func envDefaults() {
 		"DB_TYPE: " + os.Getenv("DB_TYPE") + " | " +
 		"BASE_URL_PATH: " + os.Getenv("BASE_URL_PATH") + " | " +
 		"PUBLIC_DIR: " + os.Getenv("PUBLIC_DIR") + " | " +
-		"PORT: " + os.Getenv("PORT"))
+		"PORT: " + os.Getenv("PORT") + " | " +
+		"ALLOW_BROWSING: " + os.Getenv("ALLOW_BROWSING"))
 }

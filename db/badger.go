@@ -115,16 +115,27 @@ func (b BadgerInstance) ReadTTL(key string) (value string, ttl time.Duration, er
 	// calculate ttl
 	ttl = time.Until(ttlTime)
 	return value, ttl, err
-
 }
+
+//TODO: Abstract the deletion process and keep it tidy
 
 func (b BadgerInstance) Delete(key string) error {
 	txn := b.NewTransaction(true)
+	// delete the entry itself
 	if err := txn.Delete([]byte(key)); err != nil {
 		return err
 	}
 	if err := txn.Commit(); err != nil {
 		return err
 	}
+	// delete ttl counter
+	txn = b.NewTransaction(true)
+	if err := txn.Delete([]byte(key + "_ttl")); err != nil {
+		return err
+	}
+	if err := txn.Commit(); err != nil {
+		return err
+	}
+
 	return nil
 }
