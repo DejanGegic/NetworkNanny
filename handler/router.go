@@ -5,7 +5,8 @@ import (
 	"os"
 	"time"
 
-	"example.com/middlewares/rateLimiter"
+	"example.com/middleware/rateLimiter"
+	"example.com/middleware/timer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
@@ -18,8 +19,10 @@ type LimiterConf struct {
 
 func SetUpRouter() *fiber.App {
 
+	//fiber app with logging to console
 	app := fiber.New()
 
+	app.Use(timer.Timer())
 	app.Use(rateLimiter.New(rateLimiter.DefaultLimiterConf()))
 
 	app.Use(os.Getenv("BASE_URL_PATH"), filesystem.New(filesystem.Config{

@@ -66,11 +66,10 @@ func New(config LimiterConf) fiber.Handler {
 
 	return func(c *fiber.Ctx) error {
 		ip := c.IP()
-		// timer := time.Now()
 		block, ttl := checkIp(ip, config)
-		// fmt.Println(time.Since(timer))
 
 		if block == "perma" {
+			l.Z.Info().Str("IP", c.IP()).Str("resource", c.Path()).Send()
 			return c.Status(429).SendString("PermaBanned")
 		}
 		if block != "" {
