@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"example.com/middleware/rateLimiter"
-	"example.com/middleware/timer"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
@@ -22,7 +21,9 @@ func SetUpRouter() *fiber.App {
 	//fiber app with logging to console
 	app := fiber.New()
 
-	app.Use(timer.Timer())
+	// *Uncomment if you want to log time for each request
+	// *This may prove detrimental to performance if you have huge traffic per second.
+	// app.Use(timer.Timer())
 	app.Use(rateLimiter.New(rateLimiter.DefaultLimiterConf()))
 
 	app.Use(os.Getenv("BASE_URL_PATH"), filesystem.New(filesystem.Config{
