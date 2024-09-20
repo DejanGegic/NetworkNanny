@@ -8,7 +8,7 @@
 - [🛠️ Build it yourself](#️-build-it-yourself)
 - [📈🪲 Future improvements, known bugs, etc.](#-future-improvements-known-bugs-etc)
 
-# ❓ What is this?
+# ❓ What is NetworkNanny?
 
 It's a configurable, performant, and stable file server with a built-in rate limiter, written in Go.
 
